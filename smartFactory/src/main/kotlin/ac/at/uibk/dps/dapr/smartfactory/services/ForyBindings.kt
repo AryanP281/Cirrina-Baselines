@@ -2,4 +2,10 @@ package ac.at.uibk.dps.dapr.smartfactory.services
 
 data class EmptyRequest(val dummy: String = "") {}
 
+data class MessageProcessingRequest(val msg: String = "") {}
+
 data class BeamDetectionResponse(val interrupted: Boolean)
+
+data class StatisticsRequest(val nScans : Int, val nAssemblies : Int, val productsCompleted: Int, val jobDone : Boolean)
+
+data class PhotoScanResponse(val validObject : Boolean)

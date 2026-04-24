@@ -1,5 +1,7 @@
 package ac.at.uibk.dps.dapr.smartfactory.actors.messageprocessor
 
+import ac.at.uibk.dps.dapr.smartfactory.services.MessageProcessingRequest
+import ac.at.uibk.dps.dapr.smartfactory.services.Services
 import io.dapr.actors.ActorId
 import io.dapr.actors.runtime.AbstractActor
 import io.dapr.actors.runtime.ActorRuntimeContext
@@ -42,7 +44,7 @@ class MessageProcessorImpl(
   }
 
   private fun processState(msg: String) {
-    logger.info("Processing message: $msg")
+    Services.processEmail(MessageProcessingRequest(msg)).subscribe()
 
     transition(MessageProcessorActor.States.IDLE)
   }

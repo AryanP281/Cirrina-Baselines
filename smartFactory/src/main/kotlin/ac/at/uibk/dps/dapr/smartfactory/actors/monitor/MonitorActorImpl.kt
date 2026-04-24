@@ -1,5 +1,7 @@
 package ac.at.uibk.dps.dapr.smartfactory.actors.monitor
 
+import ac.at.uibk.dps.dapr.smartfactory.services.Services
+import ac.at.uibk.dps.dapr.smartfactory.services.StatisticsRequest
 import io.dapr.actors.ActorId
 import io.dapr.actors.runtime.AbstractActor
 import io.dapr.actors.runtime.ActorRuntimeContext
@@ -11,12 +13,14 @@ class MonitorActorImpl(runtimeContext: ActorRuntimeContext<MonitorActorImpl>, id
   private var nScans = 0
   private var nAssemblies = 0
   private var productsCompleted = 0
+  private var jobDone = false
 
   override fun markScanned() {
     if (currentActiveState == MonitorActor.States.MONITORING) {
       nScans++
 
-      // TODO: Invoke SendStatistics service
+      //Invoke SendStatistics service
+      Services.sendStatistics(StatisticsRequest(nScans, nAssemblies, productsCompleted, jobDone)).subscribe()
     }
   }
 
@@ -24,7 +28,8 @@ class MonitorActorImpl(runtimeContext: ActorRuntimeContext<MonitorActorImpl>, id
     if (currentActiveState == MonitorActor.States.MONITORING) {
       nAssemblies++
 
-      // TODO: Invoke SendStatistics service
+      //Invoke SendStatistics service
+      Services.sendStatistics(StatisticsRequest(nScans, nAssemblies, productsCompleted, jobDone)).subscribe()
     }
   }
 
@@ -32,11 +37,13 @@ class MonitorActorImpl(runtimeContext: ActorRuntimeContext<MonitorActorImpl>, id
     if (currentActiveState == MonitorActor.States.MONITORING) {
       productsCompleted++
 
-      // TODO: Invoke SendStatistics service
+      //Invoke SendStatistics service
+      Services.sendStatistics(StatisticsRequest(nScans, nAssemblies, productsCompleted, jobDone)).subscribe()
     }
   }
 
   override fun markJobDone() {
     currentActiveState = MonitorActor.States.JOB_DONE
+    jobDone = true
   }
 }

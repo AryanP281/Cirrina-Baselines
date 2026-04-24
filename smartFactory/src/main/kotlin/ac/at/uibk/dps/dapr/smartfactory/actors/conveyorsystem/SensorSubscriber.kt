@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-class SensorActorSubscriber {
+class SensorSubscriber {
   private val actorId = System.getenv("ACTOR_ID") ?: "sensor-0"
   private val proxy: SensorActor =
     ActorProxyBuilder(SensorActor::class.java, ActorClient()).build(ActorId(actorId))

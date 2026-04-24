@@ -16,11 +16,30 @@ object Services {
     Fory.builder().withLanguage(Language.XLANG).withRefTracking(true).buildThreadSafeFory().apply {
       register(EmptyRequest::class.java)
       register(BeamDetectionResponse::class.java)
+      register(StatisticsRequest::class.java)
+      register(MessageProcessingRequest::class.java)
+      register(PhotoScanResponse::class.java)
     }
 
   private val threadBuffer = ThreadLocal.withInitial { MemoryBuffer.newHeapBuffer(1024) }
   private val client = HttpClient.newHttpClient()
   private val baseUrl = "http://localhost:6000"
+
+  fun processEmail(req : MessageProcessingRequest) : Mono<Void>
+  {
+    val buffer = threadBuffer.get().apply { writerIndex(0) }
+    fory.serialize(buffer, req)
+
+    val request = HttpRequest.newBuilder()
+      .uri(URI.create("$baseUrl/process/email"))
+      .header("Content-Type", "application/x-fury")
+      .POST(HttpRequest.BodyPublishers.ofByteArray(buffer.getBytes(0, buffer.writerIndex())))
+      .build()
+
+    client.sendAsync(request, HttpResponse.BodyHandlers.ofByteArray())
+
+    return Mono.empty()
+  }
 
   fun beamDetectionStart(): Mono<BeamDetectionResponse> {
     val request = HttpRequest.newBuilder()
@@ -33,4 +52,51 @@ object Services {
         .thenApply { response -> fory.deserialize(response.body()) as BeamDetectionResponse}
     )
   }
+
+  fun sendStatistics(req : StatisticsRequest) : Mono<Void> {
+    val buffer = threadBuffer.get().apply { writerIndex(0) }
+    fory.serialize(buffer, req)
+
+    val request = HttpRequest.newBuilder()
+      .uri(URI.create("$baseUrl/statistics"))
+      .header("Content-Type", "application/x-fury")
+      .POST(HttpRequest.BodyPublishers.ofByteArray(buffer.getBytes(0, buffer.writerIndex())))
+      .build()
+
+    return Mono.fromFuture(
+      client.sendAsync(request, HttpResponse.BodyHandlers.ofString()).thenApply { response ->
+        null
+      }
+    )
+  }
+
+  fun takePhoto() : Mono<Void>
+  {
+    val request = HttpRequest.newBuilder()
+      .uri(URI.create("$baseUrl/takePhoto"))
+      .GET()
+      .build()
+
+    return Mono.fromFuture(
+      client.sendAsync(request, HttpResponse.BodyHandlers.ofString()).thenApply { response ->
+        null
+      }
+    )
+
+  }
+
+  fun scanPhoto() : Mono<PhotoScanResponse>
+  {
+    val request = HttpRequest.newBuilder()
+      .uri(URI.create("$baseUrl/scanphoto"))
+      .GET()
+      .build()
+
+    return Mono.fromFuture(
+      client.sendAsync(request, HttpResponse.BodyHandlers.ofByteArray()).thenApply { response ->
+        fory.deserialize(response.body()) as PhotoScanResponse
+      }
+    )
+  }
+
 }
