@@ -20,9 +20,21 @@
       <module name="cirrina-baselines.diningPhilosophers" options="-parameters" />
       <module name="cirrina-baselines.diningPhilosophers.main" options="-parameters" />
       <module name="cirrina-baselines.diningPhilosophers.test" options="-parameters" />
+      <module name="cirrina-baselines.dynamicPhilosophers" options="-parameters" />
+      <module name="cirrina-baselines.dynamicPhilosophers.main" options="-parameters" />
+      <module name="cirrina-baselines.dynamicPhilosophers.test" options="-parameters" />
+      <module name="cirrina-baselines.pingPong" options="-parameters" />
+      <module name="cirrina-baselines.pingPong.main" options="-parameters" />
+      <module name="cirrina-baselines.pingPong.test" options="-parameters" />
       <module name="cirrina-baselines.sleepingBarber" options="-parameters" />
       <module name="cirrina-baselines.sleepingBarber.main" options="-parameters" />
       <module name="cirrina-baselines.sleepingBarber.test" options="-parameters" />
+      <module name="cirrina-baselines.smartBuilding" options="-parameters" />
+      <module name="cirrina-baselines.smartBuilding.main" options="-parameters" />
+      <module name="cirrina-baselines.smartBuilding.test" options="-parameters" />
+      <module name="cirrina-baselines.smartFactory" options="-parameters" />
+      <module name="cirrina-baselines.smartFactory.main" options="-parameters" />
+      <module name="cirrina-baselines.smartFactory.test" options="-parameters" />
     </option>
   </component>
 </project>
