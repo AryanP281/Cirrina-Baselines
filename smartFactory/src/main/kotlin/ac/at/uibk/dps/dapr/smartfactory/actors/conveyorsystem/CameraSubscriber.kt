@@ -17,7 +17,7 @@ class CameraSubscriber {
 
     @Topic(name = "eStartScan", pubsubName = "pubsub")
     @PostMapping("/eStartScan")
-    fun setIsUnloading(@RequestBody event: CloudEvent<Boolean>) {
+    fun setIsUnloading() {
         proxy.startScan()
     }
 

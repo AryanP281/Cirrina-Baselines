@@ -22,6 +22,10 @@ class CameraActorImpl(
         when(targetState) {
             CameraActor.States.IDLE -> {
                 if(currentActiveState == CameraActor.States.SCANNING) {
+                    //Exit actions
+                    isScanning = false
+                    daprClient.publishEvent("pubsub", "isScanning", isScanning).subscribe()
+
                     currentActiveState = CameraActor.States.IDLE
                 }
             }

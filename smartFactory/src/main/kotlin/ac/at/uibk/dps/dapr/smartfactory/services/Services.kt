@@ -19,6 +19,8 @@ object Services {
       register(StatisticsRequest::class.java)
       register(MessageProcessingRequest::class.java)
       register(PhotoScanResponse::class.java)
+      register(PickupResponse::class.java)
+      register(AssembleResponse::class.java)
     }
 
   private val threadBuffer = ThreadLocal.withInitial { MemoryBuffer.newHeapBuffer(1024) }
@@ -95,6 +97,76 @@ object Services {
     return Mono.fromFuture(
       client.sendAsync(request, HttpResponse.BodyHandlers.ofByteArray()).thenApply { response ->
         fory.deserialize(response.body()) as PhotoScanResponse
+      }
+    )
+  }
+
+  fun moveBelt() : Mono<Void>
+  {
+    val request = HttpRequest.newBuilder()
+      .uri(URI.create("$baseUrl/movebelt"))
+      .GET()
+      .build()
+
+    return Mono.fromFuture(
+      client.sendAsync(request, HttpResponse.BodyHandlers.ofString()).thenApply { response ->
+        null
+      }
+    )
+  }
+
+  fun stopBelt() : Mono<Void>
+  {
+    val request = HttpRequest.newBuilder()
+      .uri(URI.create("$baseUrl/stopbelt"))
+      .GET()
+      .build()
+
+    return Mono.fromFuture(
+      client.sendAsync(request, HttpResponse.BodyHandlers.ofString()).thenApply { response ->
+        null
+      }
+    )
+  }
+
+  fun pickUp() : Mono<PickupResponse>
+  {
+    val request = HttpRequest.newBuilder()
+      .uri(URI.create("$baseUrl/pickup"))
+      .GET()
+      .build()
+
+    return Mono.fromFuture(
+      client.sendAsync(request, HttpResponse.BodyHandlers.ofByteArray()).thenApply { response ->
+        fory.deserialize(response.body()) as PickupResponse
+      }
+    )
+  }
+
+  fun assemble() : Mono<AssembleResponse>
+  {
+    val request = HttpRequest.newBuilder()
+      .uri(URI.create("$baseUrl/assemble"))
+      .GET()
+      .build()
+
+    return Mono.fromFuture(
+      client.sendAsync(request, HttpResponse.BodyHandlers.ofByteArray()).thenApply { response ->
+        fory.deserialize(response.body()) as AssembleResponse
+      }
+    )
+  }
+
+  fun returnToStart() : Mono<Void>
+  {
+    val request = HttpRequest.newBuilder()
+      .uri(URI.create("$baseUrl/returntostart"))
+      .GET()
+      .build()
+
+    return Mono.fromFuture(
+      client.sendAsync(request, HttpResponse.BodyHandlers.ofString()).thenApply { response ->
+        null
       }
     )
   }

@@ -20,6 +20,18 @@ class MonitorSubscriber {
     proxy.incrementProductsCompletedCount()
   }
 
+  @Topic(name = "eScanned", pubsubName = "pubsub")
+  @PostMapping("/eScanned")
+  fun incrementScannedCount() {
+    proxy.markScanned()
+  }
+
+  @Topic(name = "eAssemblyComplete", pubsubName = "pubsub")
+  @PostMapping("/eAssemblyComplete")
+  fun incrementAssembledCount() {
+    proxy.markAssembled()
+  }
+
   @Topic(name = "eJobDone", pubsubName = "pubsub")
   @PostMapping("/eJobDone")
   fun markJobDone() {
