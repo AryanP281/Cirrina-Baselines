@@ -7,13 +7,15 @@ import io.dapr.actors.runtime.ActorRuntimeContext
 import io.dapr.client.DaprClientBuilder
 import java.time.Duration
 import reactor.core.publisher.Mono
+import java.util.concurrent.atomic.AtomicBoolean
 
-class SensorActorImpl(runtimeContext: ActorRuntimeContext<SensorActorImpl>, id: ActorId, private val sensorType : SensorActor.Types) :
+class SensorActorImpl(runtimeContext: ActorRuntimeContext<SensorActorImpl>, id: ActorId) :
   AbstractActor(runtimeContext, id), SensorActor {
-  var currentActiveState: SensorActor.States = SensorActor.States.IDLE
-  var isUnloading: Boolean = false
-  var isScanning: Boolean = false
-  var isBeamInterrupted: Boolean = false
+  private var currentActiveState: SensorActor.States = SensorActor.States.IDLE
+  private var isUnloading: Boolean = false
+  private var isScanning: Boolean = false
+  private var isBeamInterrupted: Boolean = false
+  private val sensorType : SensorActor.Types = if (id.toString().startsWith("start")) SensorActor.Types.START else SensorActor.Types.END
 
   private val daprClient = DaprClientBuilder().build()
 
@@ -52,20 +54,35 @@ class SensorActorImpl(runtimeContext: ActorRuntimeContext<SensorActorImpl>, id: 
     this.isScanning = isScanning
   }
 
+  override fun onBeamDetectionTimeout(): Mono<Void> {
+    return if (!isUnloading && !isScanning) {
+      unregisterTimer("beamDetectionTimeout-${id}")
+        .doOnSuccess {
+          transition(SensorActor.States.DETECTING)
+        }
+        .then()
+    } else {
+      Mono.empty()
+    }
+  }
+
   private fun idleState() {
     // Starting beam detection timer
     registerActorTimer(
-      "beamDetectionTimeout",
+      "beamDetectionTimeout-${id}",
       "onBeamDetectionTimeout",
-      null,
+      emptyMap<String,Any>(),
       Duration.ofSeconds(1),
       Duration.ofSeconds(1),
-    )
+    ).subscribe()
   }
 
   private fun detectingState() {
     //Invoke beam detection service
-    isBeamInterrupted = Services.beamDetectionStart().block()?.interrupted ?: false
+    isBeamInterrupted = when(sensorType) {
+      SensorActor.Types.START -> Services.beamDetectionStart().block()?.interrupted ?: false
+      SensorActor.Types.END -> Services.beamDetectionEnd().block()?.interrupted ?: false
+    }
 
     if(isBeamInterrupted)
       transition(SensorActor.States.DETECTED)
@@ -80,15 +97,6 @@ class SensorActorImpl(runtimeContext: ActorRuntimeContext<SensorActorImpl>, id: 
     else {
       daprClient.publishEvent("pubsub", "eStartUnload", mapOf<String,Any>()).subscribe()
     }
-
     transition(SensorActor.States.IDLE)
-  }
-
-  fun onBeamDetectionTimeout(state: Any?): Mono<Void> {
-    if (!isUnloading && !isScanning) {
-      transition(SensorActor.States.DETECTING)
-      unregisterTimer("beamDetectionTimeout")
-    }
-    return Mono.empty()
   }
 }
