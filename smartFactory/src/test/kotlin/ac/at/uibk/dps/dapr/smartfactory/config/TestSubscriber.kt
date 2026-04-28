@@ -1,5 +1,8 @@
 package ac.at.uibk.dps.dapr.smartfactory.config
 
+import ac.at.uibk.dps.dapr.smartfactory.actors.conveyorsystem.BeltActor
+import ac.at.uibk.dps.dapr.smartfactory.actors.conveyorsystem.CameraActor
+import ac.at.uibk.dps.dapr.smartfactory.actors.conveyorsystem.SensorActor
 import ac.at.uibk.dps.dapr.smartfactory.actors.messageprocessor.MessageProcessorActor
 import ac.at.uibk.dps.dapr.smartfactory.actors.monitor.MonitorActor
 import io.dapr.Topic
@@ -49,6 +52,20 @@ class TestSubscriber(
     @PostMapping("/eAssemblyComplete")
     fun incrementAssembledCount() : ResponseEntity<Unit> {
         behavior.eAssemblyCompleteBehavior()
+        return ResponseEntity.ok().build()
+    }
+
+    @Topic(name = "eStartScan", pubsubName = "pubsub")
+    @PostMapping("/eStartScan")
+    fun startScan() : ResponseEntity<Unit> {
+        behavior.eStartScanBehavior()
+        return ResponseEntity.ok().build()
+    }
+
+    @Topic(name = "eStartUnload", pubsubName = "pubsub")
+    @PostMapping("/eStartUnload")
+    fun startUnloading() : ResponseEntity<Unit> {
+        behavior.eStartUnloadBehavior()
         return ResponseEntity.ok().build()
     }
 }

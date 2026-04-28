@@ -30,12 +30,7 @@ fun main(args: Array<String>)
     "jobcontroller" -> ActorRuntime.getInstance().registerActor(JobControllerActorImpl::class.java)
     "monitor" -> ActorRuntime.getInstance().registerActor(MonitorActorImpl::class.java)
     "messageprocessor" -> ActorRuntime.getInstance().registerActor(MessageProcessorImpl::class.java)
-    "startsensor" -> ActorRuntime.getInstance().registerActor(SensorActorImpl::class.java) {runtimeContext, actorId ->
-      SensorActorImpl(runtimeContext, actorId, SensorActor.Types.START)
-    }
-    "endsensor" -> ActorRuntime.getInstance().registerActor(SensorActorImpl::class.java) {runtimeContext, actorId ->
-      SensorActorImpl(runtimeContext, actorId, SensorActor.Types.END)
-    }
+    "sensor" -> ActorRuntime.getInstance().registerActor(SensorActorImpl::class.java)
     "camera" -> ActorRuntime.getInstance().registerActor(CameraActorImpl::class.java)
     "belt" -> ActorRuntime.getInstance().registerActor(BeltActorImpl::class.java)
     "arm" -> ActorRuntime.getInstance().registerActor(ArmActorImpl::class.java)
@@ -46,6 +41,7 @@ fun main(args: Array<String>)
 
   when(role) {
     "jobcontroller" -> ActorProxyBuilder(JobControllerActor::class.java, ActorClient()).build(ActorId(actorId)).initialize()
+    "sensor" -> ActorProxyBuilder(SensorActor::class.java, ActorClient()).build(ActorId(actorId)).initialize()
   }
 }
 

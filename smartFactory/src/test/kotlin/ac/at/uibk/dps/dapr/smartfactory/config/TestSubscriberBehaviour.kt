@@ -22,4 +22,10 @@ class TestSubscriberBehaviour {
 
     @Volatile
     var eAssemblyCompleteBehavior : () -> Unit = {}
+
+    @Volatile
+    var eStartScanBehavior : () -> Unit = {}
+
+    @Volatile
+    var eStartUnloadBehavior : () -> Unit = {}
 }

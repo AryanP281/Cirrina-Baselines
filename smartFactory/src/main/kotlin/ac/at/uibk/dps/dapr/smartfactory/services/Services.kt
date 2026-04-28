@@ -51,6 +51,20 @@ object Services {
 
     return Mono.fromFuture(
       client.sendAsync(request, HttpResponse.BodyHandlers.ofByteArray())
+        .thenApply { response ->
+          fory.deserialize(response.body()) as BeamDetectionResponse
+        }
+    )
+  }
+
+  fun beamDetectionEnd(): Mono<BeamDetectionResponse> {
+    val request = HttpRequest.newBuilder()
+      .uri(URI.create("$baseUrl/detectbeam/end"))
+      .GET()
+      .build()
+
+    return Mono.fromFuture(
+      client.sendAsync(request, HttpResponse.BodyHandlers.ofByteArray())
         .thenApply { response -> fory.deserialize(response.body()) as BeamDetectionResponse}
     )
   }
