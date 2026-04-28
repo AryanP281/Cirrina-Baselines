@@ -6,6 +6,7 @@ import io.dapr.actors.runtime.ActorRuntimeContext
 import io.dapr.client.DaprClientBuilder
 import org.slf4j.LoggerFactory
 import reactor.core.publisher.Mono
+import reactor.core.publisher.Mono.create
 
 class JobControllerActorImpl(
   runtimeContext: ActorRuntimeContext<JobControllerActorImpl>,
@@ -17,9 +18,8 @@ class JobControllerActorImpl(
 
   private val daprClient = DaprClientBuilder().build()
 
-  override fun initialize() : Mono<Void> {
-
-    return Mono.create { sink -> transition(JobControllerActor.States.STARTING)}
+  override fun initialize() {
+    transition(JobControllerActor.States.STARTING)
   }
 
   override fun markProductCompleted() {

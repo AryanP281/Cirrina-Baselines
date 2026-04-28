@@ -12,7 +12,7 @@ interface JobControllerActor {
     JOB_DONE,
   }
 
-  @ActorMethod(name = "initialize") fun initialize() : Mono<Void>
+  @ActorMethod(name = "initialize") fun initialize()
 
   @ActorMethod(name = "markProductCompleted") fun markProductCompleted()
 

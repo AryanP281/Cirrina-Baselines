@@ -13,10 +13,13 @@ import io.dapr.actors.client.ActorClient
 import io.dapr.actors.client.ActorProxyBuilder
 import io.dapr.client.domain.CloudEvent
 import org.slf4j.LoggerFactory
+import org.springframework.context.annotation.Profile
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 
+@Profile("!test")
 @RestController
 class EventSubscriber {
     private val role = System.getenv("ROLE")
@@ -34,109 +37,123 @@ class EventSubscriber {
 
     @Topic(name = "eProductComplete", pubsubName = "pubsub")
     @PostMapping("/eProductComplete")
-    fun newProductComplete() {
+    fun newProductComplete() : ResponseEntity<Unit> {
         when(actorProxy){
             is JobControllerActor -> (actorProxy as JobControllerActor).markProductCompleted()
             is MonitorActor -> (actorProxy as MonitorActor).incrementProductsCompletedCount()
         }
+
+        return ResponseEntity.ok().build()
     }
 
     @Topic(name = "eProcessMessage", pubsubName = "pubsub")
     @PostMapping("/eProcessMessage")
-    fun processMessage(@RequestBody event: CloudEvent<Map<String, String>>)
+    fun processMessage(@RequestBody event: CloudEvent<Map<String, String>>) : ResponseEntity<Unit>
     {
         if(actorProxy is MessageProcessorActor)
             (actorProxy as MessageProcessorActor).processMessage(event.data["msg"] ?: "")
+        return ResponseEntity.ok().build()
     }
 
     @Topic(name = "eScanned", pubsubName = "pubsub")
     @PostMapping("/monitor/eScanned")
-    fun incrementScannedCount() {
+    fun incrementScannedCount() : ResponseEntity<Unit> {
         when(actorProxy) {
             is MonitorActor -> (actorProxy as MonitorActor).markScanned()
         }
+        return ResponseEntity.ok().build()
     }
 
     @Topic(name = "eAssemblyComplete", pubsubName = "pubsub")
     @PostMapping("/monitor/eAssemblyComplete")
-    fun incrementAssembledCount() {
+    fun incrementAssembledCount() : ResponseEntity<Unit> {
         when(actorProxy) {
             is MonitorActor -> (actorProxy as MonitorActor).markAssembled()
         }
+        return ResponseEntity.ok().build()
     }
 
     @Topic(name = "isUnloading", pubsubName = "pubsub")
     @PostMapping("/isUnloading")
-    fun setIsUnloading(@RequestBody event: CloudEvent<Boolean>) {
+    fun setIsUnloading(@RequestBody event: CloudEvent<Boolean>) : ResponseEntity<Unit> {
         when(actorProxy) {
             is SensorActor -> (actorProxy as SensorActor).setIsUnloading(event.data)
         }
+        return ResponseEntity.ok().build()
     }
 
     @Topic(name = "isScanning", pubsubName = "pubsub")
     @PostMapping("/isScanning")
-    fun setIsScanning(@RequestBody event: CloudEvent<Boolean>) {
+    fun setIsScanning(@RequestBody event: CloudEvent<Boolean>) : ResponseEntity<Unit> {
         when(actorProxy) {
             is SensorActor -> (actorProxy as SensorActor).setIsScanning(event.data)
         }
+        return ResponseEntity.ok().build()
     }
 
     @Topic(name = "eStartScan", pubsubName = "pubsub")
     @PostMapping("/eStartScan")
-    fun startScan() {
+    fun startScan() : ResponseEntity<Unit> {
         when(actorProxy) {
             is CameraActor -> (actorProxy as CameraActor).startScan()
         }
+        return ResponseEntity.ok().build()
     }
 
     @Topic(name = "eObjectValid", pubsubName = "pubsub")
     @PostMapping("/eObjectValid")
-    fun setObjectValidity(@RequestBody event: CloudEvent<Boolean>) {
+    fun setObjectValidity(@RequestBody event: CloudEvent<Boolean>) : ResponseEntity<Unit> {
         when(actorProxy) {
             is BeltActor -> (actorProxy as BeltActor).markObjectValidity(event.data)
         }
+        return ResponseEntity.ok().build()
     }
 
     @Topic(name = "eStartUnload", pubsubName = "pubsub")
     @PostMapping("/eStartUnload")
-    fun startUnloading() {
+    fun startUnloading() : ResponseEntity<Unit> {
         when(actorProxy) {
             is BeltActor -> (actorProxy as BeltActor).startUnloading()
         }
+        return ResponseEntity.ok().build()
     }
 
     @Topic(name = "ePickedUp", pubsubName = "pubsub")
     @PostMapping("/ePickedUp")
-    fun markPickedUp() {
+    fun markPickedUp() : ResponseEntity<Unit> {
         when(actorProxy) {
             is BeltActor -> (actorProxy as BeltActor).markPickedUp()
         }
+        return ResponseEntity.ok().build()
     }
 
     @Topic(name = "eArmPickup", pubsubName = "pubsub")
     @PostMapping("/eArmPickup")
-    fun pickup() {
+    fun pickup() : ResponseEntity<Unit> {
         when(actorProxy) {
             is ArmActor -> (actorProxy as ArmActor).initiatePickup()
         }
+        return ResponseEntity.ok().build()
     }
 
     @Topic(name = "eUpdatePickupSuccessStatus", pubsubName = "pubsub")
     @PostMapping("/eUpdatePickupSuccessStatus")
-    fun updatePickupStatus(@RequestBody event: CloudEvent<Boolean>) {
+    fun updatePickupStatus(@RequestBody event: CloudEvent<Boolean>) : ResponseEntity<Unit> {
         when(actorProxy) {
             is ArmActor -> (actorProxy as ArmActor).updatePickupStatus(event.data)
         }
+        return ResponseEntity.ok().build()
     }
 
     @Topic(name = "eJobDone", pubsubName = "pubsub")
     @PostMapping("/eJobDone")
-    fun markJobDone() {
+    fun markJobDone() : ResponseEntity<Unit> {
         when(actorProxy) {
             is MessageProcessorActor -> (actorProxy as MessageProcessorActor).markJobDone()
             is MonitorActor -> (actorProxy as MonitorActor).markJobDone()
             is BeltActor -> (actorProxy as BeltActor).markJobDone()
             is ArmActor -> (actorProxy as ArmActor).markJobDone()
         }
+        return ResponseEntity.ok().build()
     }
 }
