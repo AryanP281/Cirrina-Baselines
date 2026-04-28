@@ -1,6 +1,7 @@
 package ac.at.uibk.dps.dapr.smartfactory.config
 
 import ac.at.uibk.dps.dapr.smartfactory.actors.jobcontroller.JobControllerActorImpl
+import ac.at.uibk.dps.dapr.smartfactory.actors.messageprocessor.MessageProcessorImpl
 import ac.at.uibk.dps.dapr.smartfactory.actors.monitor.MonitorActorImpl
 import io.dapr.actors.runtime.ActorRuntime
 import jakarta.annotation.PostConstruct
@@ -14,6 +15,7 @@ class TestActorsConfig {
     @PostConstruct
     fun registerActors() {
         ActorRuntime.getInstance().registerActor(JobControllerActorImpl::class.java)
+        ActorRuntime.getInstance().registerActor(MessageProcessorImpl::class.java)
         ActorRuntime.getInstance().registerActor(MonitorActorImpl::class.java)
     }
 
