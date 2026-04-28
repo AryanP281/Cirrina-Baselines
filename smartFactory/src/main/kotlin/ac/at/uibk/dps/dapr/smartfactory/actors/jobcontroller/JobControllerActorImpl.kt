@@ -4,6 +4,8 @@ import io.dapr.actors.ActorId
 import io.dapr.actors.runtime.AbstractActor
 import io.dapr.actors.runtime.ActorRuntimeContext
 import io.dapr.client.DaprClientBuilder
+import org.slf4j.LoggerFactory
+import reactor.core.publisher.Mono
 
 class JobControllerActorImpl(
   runtimeContext: ActorRuntimeContext<JobControllerActorImpl>,
@@ -15,8 +17,9 @@ class JobControllerActorImpl(
 
   private val daprClient = DaprClientBuilder().build()
 
-  override fun initialize() {
-    transition(JobControllerActor.States.STARTING)
+  override fun initialize() : Mono<Void> {
+
+    return Mono.create { sink -> transition(JobControllerActor.States.STARTING)}
   }
 
   override fun markProductCompleted() {
@@ -52,7 +55,7 @@ class JobControllerActorImpl(
 
   private fun startingState() {
     // Emit event to Message Processor
-    daprClient.publishEvent("pubsub", "eProcessMessage", mapOf("msg" to "Job started..."))
+    daprClient.publishEvent("pubsub", "eProcessMessage", mapOf("msg" to "Job started...")).subscribe()
 
     // Transition to running state
     transition(JobControllerActor.States.RUNNING)
@@ -60,9 +63,9 @@ class JobControllerActorImpl(
 
   private fun jobDoneState() {
     // Emit event to Message Processor
-    daprClient.publishEvent("pubsub", "eProcessMessage", mapOf("msg" to "Job done..."))
+    daprClient.publishEvent("pubsub", "eProcessMessage", mapOf("msg" to "Job done...")).subscribe()
 
     // Emit JobDone
-    daprClient.publishEvent("pubsub", "eJobDone", null).subscribe()
+    daprClient.publishEvent("pubsub", "eJobDone", mapOf<String,Any>()).subscribe()
   }
 }
