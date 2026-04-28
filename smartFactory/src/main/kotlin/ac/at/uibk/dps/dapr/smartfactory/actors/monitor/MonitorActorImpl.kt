@@ -45,5 +45,8 @@ class MonitorActorImpl(runtimeContext: ActorRuntimeContext<MonitorActorImpl>, id
   override fun markJobDone() {
     currentActiveState = MonitorActor.States.JOB_DONE
     jobDone = true
+
+    //Invoke SendStatistics service
+    Services.sendStatistics(StatisticsRequest(nScans, nAssemblies, productsCompleted, jobDone)).subscribe()
   }
 }

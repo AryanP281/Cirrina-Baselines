@@ -56,7 +56,7 @@ class EventSubscriber {
     }
 
     @Topic(name = "eScanned", pubsubName = "pubsub")
-    @PostMapping("/monitor/eScanned")
+    @PostMapping("/eScanned")
     fun incrementScannedCount() : ResponseEntity<Unit> {
         when(actorProxy) {
             is MonitorActor -> (actorProxy as MonitorActor).markScanned()
@@ -65,7 +65,7 @@ class EventSubscriber {
     }
 
     @Topic(name = "eAssemblyComplete", pubsubName = "pubsub")
-    @PostMapping("/monitor/eAssemblyComplete")
+    @PostMapping("/eAssemblyComplete")
     fun incrementAssembledCount() : ResponseEntity<Unit> {
         when(actorProxy) {
             is MonitorActor -> (actorProxy as MonitorActor).markAssembled()

@@ -103,7 +103,7 @@ class ArmActorImpl(
         if(pickupSuccess)
         {
             //Raise ePickedUp
-            daprClient.publishEvent("pubsub", "ePickedUp", null).subscribe()
+            daprClient.publishEvent("pubsub", "ePickedUp", mapOf<String,Any>()).subscribe()
 
             transition(ArmActor.States.ASSEMBLE)
         }
@@ -122,7 +122,7 @@ class ArmActorImpl(
         if(assemblyStatus)
         {
             partsAssembled++
-            daprClient.publishEvent("pubsub", "eAssemblyComplete", null).subscribe()
+            daprClient.publishEvent("pubsub", "eAssemblyComplete", mapOf<String,Any>()).subscribe()
             transition(ArmActor.States.RETURN)
         }
         else
@@ -149,7 +149,7 @@ class ArmActorImpl(
         if(partsAssembled >= partsPerProduct)
         {
             partsAssembled = 0
-            daprClient.publishEvent("pubsub", "eProductComplete", null).subscribe()
+            daprClient.publishEvent("pubsub", "eProductComplete", mapOf<String,Any>()).subscribe()
         }
 
         transition(ArmActor.States.IDLE)

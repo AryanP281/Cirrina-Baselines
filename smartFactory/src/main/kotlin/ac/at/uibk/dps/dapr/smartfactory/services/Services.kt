@@ -25,7 +25,7 @@ object Services {
 
   private val threadBuffer = ThreadLocal.withInitial { MemoryBuffer.newHeapBuffer(1024) }
   private val client = HttpClient.newHttpClient()
-  private val baseUrl = "http://localhost:6000"
+  var baseUrl = "http://localhost:6000"
 
   fun processEmail(req : MessageProcessingRequest) : Mono<Void>
   {

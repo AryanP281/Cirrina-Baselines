@@ -75,10 +75,10 @@ class SensorActorImpl(runtimeContext: ActorRuntimeContext<SensorActorImpl>, id: 
 
   private fun detectedState() {
     if(sensorType == SensorActor.Types.START) {
-      daprClient.publishEvent("pubsub", "eStartScan", null).subscribe()
+      daprClient.publishEvent("pubsub", "eStartScan", mapOf<String,Any>()).subscribe()
     }
     else {
-      daprClient.publishEvent("pubsub", "eStartUnload", null).subscribe()
+      daprClient.publishEvent("pubsub", "eStartUnload", mapOf<String,Any>()).subscribe()
     }
 
     transition(SensorActor.States.IDLE)

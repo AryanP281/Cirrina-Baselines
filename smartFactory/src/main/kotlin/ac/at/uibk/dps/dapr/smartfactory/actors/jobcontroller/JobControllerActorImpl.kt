@@ -27,7 +27,7 @@ class JobControllerActorImpl(
     this.checkJobDone()
   }
 
-  override fun checkJobDone() {
+  private fun checkJobDone() {
     if (productsCompleted >= totalProducts) transition(JobControllerActor.States.JOB_DONE)
   }
 

@@ -16,4 +16,10 @@ class TestSubscriberBehaviour {
 
     @Volatile
     var eProcessMessageBehavior : (String) -> Unit = {}
+
+    @Volatile
+    var eScannedBehavior : () -> Unit = {}
+
+    @Volatile
+    var eAssemblyCompleteBehavior : () -> Unit = {}
 }

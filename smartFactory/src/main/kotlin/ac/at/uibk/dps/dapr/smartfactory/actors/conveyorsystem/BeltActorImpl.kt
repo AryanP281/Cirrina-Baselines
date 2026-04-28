@@ -30,7 +30,7 @@ class BeltActorImpl (
                 if(currentActiveState == BeltActor.States.LOADING || currentActiveState == BeltActor.States.ERROR) {
                     //Exit actions
                     if(currentActiveState == BeltActor.States.LOADING)
-                        daprClient.publishEvent("pubsub", "eScanned", null).subscribe()
+                        daprClient.publishEvent("pubsub", "eScanned", mapOf<String,Any>()).subscribe()
 
                     currentActiveState = BeltActor.States.TRANSPORTING
                     transportingState()
@@ -50,7 +50,7 @@ class BeltActorImpl (
             BeltActor.States.ERROR -> {
                 if(currentActiveState == BeltActor.States.LOADING) {
                     //Exit actions
-                    daprClient.publishEvent("pubsub", "eScanned", null).subscribe()
+                    daprClient.publishEvent("pubsub", "eScanned", mapOf<String,Any>()).subscribe()
 
                     currentActiveState = BeltActor.States.ERROR
                     errorState()
@@ -60,7 +60,7 @@ class BeltActorImpl (
             BeltActor.States.JOB_DONE -> {
                 //Exit actions
                 if(currentActiveState == BeltActor.States.TRANSPORTING)
-                    daprClient.publishEvent("pubsub", "eScanned", null).subscribe()
+                    daprClient.publishEvent("pubsub", "eScanned", mapOf<String,Any>()).subscribe()
 
                 currentActiveState = BeltActor.States.JOB_DONE
             }
@@ -120,7 +120,7 @@ class BeltActorImpl (
     private fun armPickupTimeout()
     {
         //Raising eArmPickup
-        daprClient.publishEvent("pubsub", "eArmPickup", null).subscribe()
+        daprClient.publishEvent("pubsub", "eArmPickup", mapOf<String,Any>()).subscribe()
     }
 
 

@@ -1,6 +1,7 @@
 package ac.at.uibk.dps.dapr.smartfactory.config
 
 import ac.at.uibk.dps.dapr.smartfactory.actors.messageprocessor.MessageProcessorActor
+import ac.at.uibk.dps.dapr.smartfactory.actors.monitor.MonitorActor
 import io.dapr.Topic
 import io.dapr.client.domain.CloudEvent
 import org.springframework.context.annotation.Profile
@@ -34,6 +35,20 @@ class TestSubscriber(
     @PostMapping("/eJobDone")
     fun markJobDone() : ResponseEntity<Unit> {
         behavior.eJobDoneBehavior()
+        return ResponseEntity.ok().build()
+    }
+
+    @Topic(name = "eScanned", pubsubName = "pubsub")
+    @PostMapping("/eScanned")
+    fun incrementScannedCount() : ResponseEntity<Unit> {
+        behavior.eScannedBehavior()
+        return ResponseEntity.ok().build()
+    }
+
+    @Topic(name = "eAssemblyComplete", pubsubName = "pubsub")
+    @PostMapping("/eAssemblyComplete")
+    fun incrementAssembledCount() : ResponseEntity<Unit> {
+        behavior.eAssemblyCompleteBehavior()
         return ResponseEntity.ok().build()
     }
 }

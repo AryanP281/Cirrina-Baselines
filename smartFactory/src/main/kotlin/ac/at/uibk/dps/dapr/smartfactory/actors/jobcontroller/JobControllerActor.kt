@@ -15,6 +15,4 @@ interface JobControllerActor {
   @ActorMethod(name = "initialize") fun initialize()
 
   @ActorMethod(name = "markProductCompleted") fun markProductCompleted()
-
-  @ActorMethod(name = "checkJobDone") fun checkJobDone()
 }
