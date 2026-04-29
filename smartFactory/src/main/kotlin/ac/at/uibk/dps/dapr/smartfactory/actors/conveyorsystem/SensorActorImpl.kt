@@ -55,26 +55,18 @@ class SensorActorImpl(runtimeContext: ActorRuntimeContext<SensorActorImpl>, id: 
   }
 
   override fun onBeamDetectionTimeout(): Mono<Void> {
-    return if (!isUnloading && !isScanning) {
-      unregisterTimer("beamDetectionTimeout-${id}")
-        .doOnSuccess {
-          transition(SensorActor.States.DETECTING)
-        }
-        .then()
-    } else {
-      Mono.empty()
+    if (!isUnloading && !isScanning) {
+      transition(SensorActor.States.DETECTING)
     }
+    else
+      startBeamDetectionTimer()
+
+    return Mono.empty()
   }
 
   private fun idleState() {
     // Starting beam detection timer
-    registerActorTimer(
-      "beamDetectionTimeout-${id}",
-      "onBeamDetectionTimeout",
-      emptyMap<String,Any>(),
-      Duration.ofSeconds(1),
-      Duration.ofSeconds(1),
-    ).subscribe()
+    startBeamDetectionTimer()
   }
 
   private fun detectingState() {
@@ -87,7 +79,7 @@ class SensorActorImpl(runtimeContext: ActorRuntimeContext<SensorActorImpl>, id: 
     if(isBeamInterrupted)
       transition(SensorActor.States.DETECTED)
     else
-      transition(SensorActor.States.IDLE)
+      startBeamDetectionTimer()
   }
 
   private fun detectedState() {
@@ -98,5 +90,16 @@ class SensorActorImpl(runtimeContext: ActorRuntimeContext<SensorActorImpl>, id: 
       daprClient.publishEvent("pubsub", "eStartUnload", mapOf<String,Any>()).subscribe()
     }
     transition(SensorActor.States.IDLE)
+  }
+
+  private fun startBeamDetectionTimer()
+  {
+    registerActorTimer(
+      "beamDetectionTimeout-${id}",
+      "onBeamDetectionTimeout",
+      emptyMap<String,Any>(),
+      Duration.ofSeconds(1),
+      Duration.ofMillis(-1),
+    ).subscribe()
   }
 }
