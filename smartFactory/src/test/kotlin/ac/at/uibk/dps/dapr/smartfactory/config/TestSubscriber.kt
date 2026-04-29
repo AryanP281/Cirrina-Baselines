@@ -1,5 +1,6 @@
 package ac.at.uibk.dps.dapr.smartfactory.config
 
+import ac.at.uibk.dps.dapr.smartfactory.actors.arm.ArmActor
 import ac.at.uibk.dps.dapr.smartfactory.actors.conveyorsystem.BeltActor
 import ac.at.uibk.dps.dapr.smartfactory.actors.conveyorsystem.CameraActor
 import ac.at.uibk.dps.dapr.smartfactory.actors.conveyorsystem.SensorActor
@@ -76,10 +77,31 @@ class TestSubscriber(
         return ResponseEntity.ok().build()
     }
 
+    @Topic(name = "ePickedUp", pubsubName = "pubsub")
+    @PostMapping("/ePickedUp")
+    fun markPickedUp() : ResponseEntity<Unit> {
+        behavior.ePickedUpBehavior()
+        return ResponseEntity.ok().build()
+    }
+
+    @Topic(name = "eArmPickup", pubsubName = "pubsub")
+    @PostMapping("/eArmPickup")
+    fun pickup() : ResponseEntity<Unit> {
+        behavior.eArmPickupBehavior()
+        return ResponseEntity.ok().build()
+    }
+
     @Topic(name = "isScanning", pubsubName = "pubsub")
     @PostMapping("/isScanning")
     fun setIsScanning(@RequestBody event: CloudEvent<Boolean>) : ResponseEntity<Unit> {
         behavior.isScanningBehavior(event.data)
+        return ResponseEntity.ok().build()
+    }
+
+    @Topic(name = "isUnloading", pubsubName = "pubsub")
+    @PostMapping("/isUnloading")
+    fun setIsUnloading(@RequestBody event: CloudEvent<Boolean>) : ResponseEntity<Unit> {
+        behavior.isUnloadingBehavior(event.data)
         return ResponseEntity.ok().build()
     }
 }

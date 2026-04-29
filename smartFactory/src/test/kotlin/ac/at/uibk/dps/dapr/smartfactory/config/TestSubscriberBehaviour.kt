@@ -34,4 +34,13 @@ class TestSubscriberBehaviour {
 
     @Volatile
     var eObjectValidBehavior : (Boolean) -> Unit = {}
+
+    @Volatile
+    var isUnloadingBehavior : (Boolean) -> Unit = {}
+
+    @Volatile
+    var ePickedUpBehavior : () -> Unit = {}
+
+    @Volatile
+    var eArmPickupBehavior : () -> Unit = {}
 }

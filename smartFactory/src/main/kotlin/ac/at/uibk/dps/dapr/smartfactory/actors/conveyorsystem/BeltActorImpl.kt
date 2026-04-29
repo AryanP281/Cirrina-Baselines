@@ -5,6 +5,7 @@ import io.dapr.actors.ActorId
 import io.dapr.actors.runtime.AbstractActor
 import io.dapr.actors.runtime.ActorRuntimeContext
 import io.dapr.client.DaprClientBuilder
+import reactor.core.publisher.Mono
 import java.time.Duration
 
 class BeltActorImpl (
@@ -19,9 +20,13 @@ class BeltActorImpl (
     private val daprClient = DaprClientBuilder().build()
 
     private fun transition(targetState: BeltActor.States, data: Any? = null) {
+
         when(targetState) {
             BeltActor.States.LOADING -> {
                 if(currentActiveState == BeltActor.States.UNLOADING) {
+                    //Exit actions
+                    unregisterTimer("armPickupTimeout-${id}").block()
+
                     currentActiveState = targetState
                 }
             }
@@ -59,8 +64,10 @@ class BeltActorImpl (
 
             BeltActor.States.JOB_DONE -> {
                 //Exit actions
-                if(currentActiveState == BeltActor.States.TRANSPORTING)
+                if(currentActiveState == BeltActor.States.LOADING)
                     daprClient.publishEvent("pubsub", "eScanned", mapOf<String,Any>()).subscribe()
+                if(currentActiveState == BeltActor.States.UNLOADING)
+                    unregisterTimer("armPickupTimeout-${id}").block()
 
                 currentActiveState = BeltActor.States.JOB_DONE
             }
@@ -69,14 +76,13 @@ class BeltActorImpl (
     }
 
     private fun transportingState() {
-
         //Invoke MoveBelt Action
         Services.moveBelt()
     }
 
     private fun unloadingState() {
         //Starting timer for eArmPickup
-        registerActorTimer("armPickupTimeout", "armPickupTimeout", null, Duration.ofSeconds(0), Duration.ofSeconds(10))
+        registerActorTimer("armPickupTimeout-${id}", "armPickupTimeout", 0, Duration.ofSeconds(0), Duration.ofSeconds(10)).subscribe()
     }
 
     private fun errorState()
@@ -117,10 +123,12 @@ class BeltActorImpl (
         transition(BeltActor.States.LOADING)
     }
 
-    private fun armPickupTimeout()
+    override fun armPickupTimeout() : Mono<Void>
     {
         //Raising eArmPickup
         daprClient.publishEvent("pubsub", "eArmPickup", mapOf<String,Any>()).subscribe()
+
+        return Mono.empty()
     }
 
 
