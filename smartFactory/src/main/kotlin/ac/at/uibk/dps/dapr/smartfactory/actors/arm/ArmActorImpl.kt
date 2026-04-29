@@ -7,6 +7,7 @@ import io.dapr.actors.runtime.AbstractActor
 import io.dapr.actors.runtime.ActorRuntimeContext
 import io.dapr.client.DaprClientBuilder
 import org.checkerframework.checker.units.qual.A
+import reactor.core.publisher.Mono
 import java.time.Duration
 
 class ArmActorImpl(
@@ -14,7 +15,7 @@ class ArmActorImpl(
     id : ActorId
 ) : AbstractActor(runtimeContext, id), ArmActor
 {
-    private val partsPerProduct = 2
+    private val partsPerProduct = 1
     private var currActiveState = ArmActor.States.IDLE
     private var pickupSuccess = true
     private var errorMsg = ""
@@ -138,7 +139,7 @@ class ArmActorImpl(
         daprClient.publishEvent("pubsub", "eProcessMessage", mapOf("msg" to "Fatal robotic arm failure: $errorMsg")).subscribe()
 
         //Starting timer eRetry
-        registerActorTimer("eRetryTimer", "retryTimeout", null, Duration.ofSeconds(10), Duration.ofSeconds(10))
+        registerActorTimer("eRetryTimer", "retryTimeout", 0, Duration.ofSeconds(10), Duration.ofMillis(-1)).subscribe()
     }
 
     private fun returnState()
@@ -155,11 +156,13 @@ class ArmActorImpl(
         transition(ArmActor.States.IDLE)
     }
 
-    private fun retryTimeout()
+    override fun retryTimeout() : Mono<Void>
     {
         if(pickupSuccess)
             transition(ArmActor.States.ASSEMBLE)
         else
             transition(ArmActor.States.RETURN)
+
+        return Mono.empty()
     }
 }
