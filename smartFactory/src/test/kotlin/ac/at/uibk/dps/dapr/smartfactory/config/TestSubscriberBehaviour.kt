@@ -28,4 +28,10 @@ class TestSubscriberBehaviour {
 
     @Volatile
     var eStartUnloadBehavior : () -> Unit = {}
+
+    @Volatile
+    var isScanningBehavior : (Boolean) -> Unit = {}
+
+    @Volatile
+    var eObjectValidBehavior : (Boolean) -> Unit = {}
 }

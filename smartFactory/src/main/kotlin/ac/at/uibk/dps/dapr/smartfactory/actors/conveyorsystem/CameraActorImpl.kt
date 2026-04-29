@@ -44,6 +44,8 @@ class CameraActorImpl(
         {
             isScanning = true
             daprClient.publishEvent("pubsub", "isScanning", isScanning).subscribe()
+
+            transition(CameraActor.States.SCANNING)
         }
     }
 

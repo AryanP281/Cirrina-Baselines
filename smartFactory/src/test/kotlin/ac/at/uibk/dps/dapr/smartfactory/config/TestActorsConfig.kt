@@ -1,5 +1,6 @@
 package ac.at.uibk.dps.dapr.smartfactory.config
 
+import ac.at.uibk.dps.dapr.smartfactory.actors.conveyorsystem.CameraActorImpl
 import ac.at.uibk.dps.dapr.smartfactory.actors.conveyorsystem.SensorActor
 import ac.at.uibk.dps.dapr.smartfactory.actors.conveyorsystem.SensorActorImpl
 import ac.at.uibk.dps.dapr.smartfactory.actors.jobcontroller.JobControllerActorImpl
@@ -20,6 +21,7 @@ class TestActorsConfig {
         ActorRuntime.getInstance().registerActor(MessageProcessorImpl::class.java)
         ActorRuntime.getInstance().registerActor(MonitorActorImpl::class.java)
         ActorRuntime.getInstance().registerActor(SensorActorImpl::class.java)
+        ActorRuntime.getInstance().registerActor(CameraActorImpl::class.java)
     }
 
 }

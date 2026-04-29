@@ -68,4 +68,18 @@ class TestSubscriber(
         behavior.eStartUnloadBehavior()
         return ResponseEntity.ok().build()
     }
+
+    @Topic(name = "eObjectValid", pubsubName = "pubsub")
+    @PostMapping("/eObjectValid")
+    fun setObjectValidity(@RequestBody event: CloudEvent<Boolean>) : ResponseEntity<Unit> {
+        behavior.eObjectValidBehavior(event.data)
+        return ResponseEntity.ok().build()
+    }
+
+    @Topic(name = "isScanning", pubsubName = "pubsub")
+    @PostMapping("/isScanning")
+    fun setIsScanning(@RequestBody event: CloudEvent<Boolean>) : ResponseEntity<Unit> {
+        behavior.isScanningBehavior(event.data)
+        return ResponseEntity.ok().build()
+    }
 }
