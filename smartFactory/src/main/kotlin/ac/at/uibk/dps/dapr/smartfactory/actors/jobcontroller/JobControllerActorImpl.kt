@@ -12,7 +12,7 @@ class JobControllerActorImpl(
   runtimeContext: ActorRuntimeContext<JobControllerActorImpl>,
   id: ActorId,
 ) : AbstractActor(runtimeContext, id), JobControllerActor {
-  private val totalProducts = 1
+  private val totalProducts = 10
   private var currActiveState: JobControllerActor.States = JobControllerActor.States.STARTING
   private var productsCompleted = 0
 

@@ -29,7 +29,7 @@ class EventSubscriber {
         "jobcontroller" -> ActorProxyBuilder(JobControllerActor::class.java, ActorClient()).build(ActorId(actorId))
         "messageprocessor" -> ActorProxyBuilder(MessageProcessorActor::class.java, ActorClient()).build(ActorId(actorId))
         "monitor" -> ActorProxyBuilder(MonitorActor::class.java, ActorClient()).build(ActorId(actorId))
-        "startsensor", "endsensor" -> ActorProxyBuilder(SensorActor::class.java, ActorClient()).build(ActorId(actorId))
+        "sensor" -> ActorProxyBuilder(SensorActor::class.java, ActorClient()).build(ActorId(actorId))
         "camera" -> ActorProxyBuilder(CameraActor::class.java, ActorClient()).build(ActorId(actorId))
         "belt" -> ActorProxyBuilder(BeltActor::class.java, ActorClient()).build(ActorId(actorId))
         else -> ActorProxyBuilder(ArmActor::class.java, ActorClient()).build(ActorId(actorId))

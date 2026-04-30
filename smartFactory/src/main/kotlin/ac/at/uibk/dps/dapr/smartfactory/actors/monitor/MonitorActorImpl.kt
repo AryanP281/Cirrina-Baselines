@@ -23,7 +23,6 @@ class MonitorActorImpl(runtimeContext: ActorRuntimeContext<MonitorActorImpl>, id
       nScans += 1
 
       //Invoke SendStatistics service
-      logger.info("Statistics due to scan")
       Services.sendStatistics(StatisticsRequest(nScans, nAssemblies, productsCompleted, jobDone)).block()
     }
   }
@@ -33,7 +32,6 @@ class MonitorActorImpl(runtimeContext: ActorRuntimeContext<MonitorActorImpl>, id
       nAssemblies += 1
 
       //Invoke SendStatistics service
-      logger.info("Statistics due to assembly")
       Services.sendStatistics(StatisticsRequest(nScans, nAssemblies, productsCompleted, jobDone)).block()
     }
   }
@@ -44,7 +42,6 @@ class MonitorActorImpl(runtimeContext: ActorRuntimeContext<MonitorActorImpl>, id
       logger.info("$productsCompleted products completed")
 
       //Invoke SendStatistics service
-      logger.info("Statistics due to product completion")
       Services.sendStatistics(StatisticsRequest(nScans, nAssemblies, productsCompleted, jobDone)).block()
     }
   }
@@ -55,7 +52,6 @@ class MonitorActorImpl(runtimeContext: ActorRuntimeContext<MonitorActorImpl>, id
       jobDone = true
 
       //Invoke SendStatistics service
-      logger.info("Statistics due to job done")
       Services.sendStatistics(StatisticsRequest(nScans, nAssemblies, productsCompleted, jobDone)).block()
     }
   }

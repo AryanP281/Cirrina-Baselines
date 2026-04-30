@@ -16,7 +16,7 @@ class ArmActorImpl(
     id : ActorId
 ) : AbstractActor(runtimeContext, id), ArmActor
 {
-    private val partsPerProduct = 1
+    private val partsPerProduct = 3
     private var currActiveState = ArmActor.States.IDLE
     private var pickupSuccess = true
     private var errorMsg = ""
@@ -84,7 +84,6 @@ class ArmActorImpl(
     }
 
     override fun updatePickupStatus(pickupStatus: Boolean) {
-        if(currActiveState != ArmActor.States.ERROR)
             this.pickupSuccess = pickupStatus
     }
 
@@ -162,10 +161,13 @@ class ArmActorImpl(
 
     override fun retryTimeout() : Mono<Void>
     {
-        if(pickupSuccess)
-            transition(ArmActor.States.ASSEMBLE)
-        else
-            transition(ArmActor.States.RETURN)
+        if(currActiveState == ArmActor.States.ERROR)
+        {
+            if(pickupSuccess)
+                transition(ArmActor.States.ASSEMBLE)
+            else
+                transition(ArmActor.States.RETURN)
+        }
 
         return Mono.empty()
     }

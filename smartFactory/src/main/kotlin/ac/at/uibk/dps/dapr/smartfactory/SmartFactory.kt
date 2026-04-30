@@ -1,5 +1,6 @@
 package ac.at.uibk.dps.dapr.smartfactory
 
+import ac.at.uibk.dps.dapr.smartfactory.actors.arm.ArmActor
 import ac.at.uibk.dps.dapr.smartfactory.actors.arm.ArmActorImpl
 import ac.at.uibk.dps.dapr.smartfactory.actors.conveyorsystem.BeltActorImpl
 import ac.at.uibk.dps.dapr.smartfactory.actors.conveyorsystem.CameraActorImpl
@@ -42,6 +43,7 @@ fun main(args: Array<String>)
   when(role) {
     "jobcontroller" -> ActorProxyBuilder(JobControllerActor::class.java, ActorClient()).build(ActorId(actorId)).initialize()
     "sensor" -> ActorProxyBuilder(SensorActor::class.java, ActorClient()).build(ActorId(actorId)).initialize()
+    "arm" -> ActorProxyBuilder(ArmActor::class.java, ActorClient()).build(ActorId(actorId)).initialize()
   }
 }
 

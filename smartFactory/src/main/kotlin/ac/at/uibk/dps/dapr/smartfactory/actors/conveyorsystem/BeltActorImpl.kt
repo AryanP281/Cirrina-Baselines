@@ -20,7 +20,6 @@ class BeltActorImpl (
     private val daprClient = DaprClientBuilder().build()
 
     private fun transition(targetState: BeltActor.States, data: Any? = null) {
-
         when(targetState) {
             BeltActor.States.LOADING -> {
                 if(currentActiveState == BeltActor.States.UNLOADING) {
@@ -103,7 +102,6 @@ class BeltActorImpl (
     }
 
     override fun startUnloading() {
-        println(currentActiveState.name)
         if(currentActiveState == BeltActor.States.TRANSPORTING) {
             isUnloading = true
             daprClient.publishEvent("pubsub", "isUnloading", isUnloading).subscribe()
@@ -134,8 +132,11 @@ class BeltActorImpl (
 
     override fun armPickupTimeout() : Mono<Void>
     {
-        //Raising eArmPickup
-        daprClient.publishEvent("pubsub", "eArmPickup", mapOf<String,Any>()).subscribe()
+        if(currentActiveState == BeltActor.States.UNLOADING)
+        {
+            //Raising eArmPickup
+            daprClient.publishEvent("pubsub", "eArmPickup", mapOf<String,Any>()).subscribe()
+        }
 
         return Mono.empty()
     }

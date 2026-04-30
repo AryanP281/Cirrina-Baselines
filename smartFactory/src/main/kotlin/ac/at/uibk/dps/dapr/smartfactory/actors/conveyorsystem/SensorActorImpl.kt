@@ -55,11 +55,13 @@ class SensorActorImpl(runtimeContext: ActorRuntimeContext<SensorActorImpl>, id: 
   }
 
   override fun onBeamDetectionTimeout(): Mono<Void> {
-    if (!isUnloading && !isScanning) {
-      transition(SensorActor.States.DETECTING)
+    if(currentActiveState == SensorActor.States.IDLE) {
+      if (!isUnloading && !isScanning) {
+        transition(SensorActor.States.DETECTING)
+      }
+      else
+        startBeamDetectionTimer()
     }
-    else
-      startBeamDetectionTimer()
 
     return Mono.empty()
   }
@@ -79,7 +81,7 @@ class SensorActorImpl(runtimeContext: ActorRuntimeContext<SensorActorImpl>, id: 
     if(isBeamInterrupted)
       transition(SensorActor.States.DETECTED)
     else
-      startBeamDetectionTimer()
+      transition(SensorActor.States.IDLE)
   }
 
   private fun detectedState() {
