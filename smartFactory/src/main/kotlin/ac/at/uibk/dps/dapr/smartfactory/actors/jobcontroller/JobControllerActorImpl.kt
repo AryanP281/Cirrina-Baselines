@@ -23,8 +23,10 @@ class JobControllerActorImpl(
   }
 
   override fun markProductCompleted() {
-    productsCompleted += 1
-    this.checkJobDone()
+    if(currActiveState == JobControllerActor.States.RUNNING){
+      productsCompleted += 1
+      this.checkJobDone()
+    }
   }
 
   private fun checkJobDone() {

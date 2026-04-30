@@ -45,7 +45,7 @@ class BeltActorImpl (
             BeltActor.States.UNLOADING -> {
                 if(currentActiveState == BeltActor.States.TRANSPORTING) {
                     //Exit actions
-                    Services.stopBelt()
+                    Services.stopBelt().block()
 
                     currentActiveState = BeltActor.States.UNLOADING
                     unloadingState()
@@ -77,7 +77,7 @@ class BeltActorImpl (
 
     private fun transportingState() {
         //Invoke MoveBelt Action
-        Services.moveBelt()
+        Services.moveBelt().block()
     }
 
     private fun unloadingState() {
@@ -93,16 +93,22 @@ class BeltActorImpl (
 
     override fun markObjectValidity(isValid: Boolean)
     {
-        if(isValid)
-            transition(BeltActor.States.TRANSPORTING)
-        else
-            transition(BeltActor.States.ERROR)
+        if(currentActiveState == BeltActor.States.LOADING)
+        {
+            if(isValid)
+                transition(BeltActor.States.TRANSPORTING)
+            else
+                transition(BeltActor.States.ERROR)
+        }
     }
 
     override fun startUnloading() {
-        isUnloading = true
-        daprClient.publishEvent("pubsub", "isUnloading", isUnloading).subscribe()
-        transition(BeltActor.States.UNLOADING)
+        println(currentActiveState.name)
+        if(currentActiveState == BeltActor.States.TRANSPORTING) {
+            isUnloading = true
+            daprClient.publishEvent("pubsub", "isUnloading", isUnloading).subscribe()
+            transition(BeltActor.States.UNLOADING)
+        }
     }
 
     override fun markJobDone()
@@ -117,10 +123,13 @@ class BeltActorImpl (
 
     override fun markPickedUp()
     {
-        isUnloading = false
-        daprClient.publishEvent("pubsub", "isUnloading", isUnloading).subscribe()
+        if(currentActiveState == BeltActor.States.UNLOADING)
+        {
+            isUnloading = false
+            daprClient.publishEvent("pubsub", "isUnloading", isUnloading).subscribe()
 
-        transition(BeltActor.States.LOADING)
+            transition(BeltActor.States.LOADING)
+        }
     }
 
     override fun armPickupTimeout() : Mono<Void>

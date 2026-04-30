@@ -57,6 +57,10 @@ class BeltTests(
             Services.baseUrl = "http://localhost:6009"
             val beltProxy = ActorProxyBuilder(BeltActor::class.java, ActorClient()).build(ActorId("bt-0"))
 
+            testSubscriberBehaviour.eObjectValidBehavior = {
+                beltProxy.markObjectValidity(it)
+            }
+
             testSubscriberBehaviour.eStartUnloadBehavior = {
                 beltProxy.startUnloading()
             }

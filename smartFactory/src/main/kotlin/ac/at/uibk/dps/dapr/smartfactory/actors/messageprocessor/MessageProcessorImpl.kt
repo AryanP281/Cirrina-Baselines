@@ -36,15 +36,17 @@ class MessageProcessorImpl(
   }
 
   override fun processMessage(message: String) {
-    transition(MessageProcessorActor.States.PROCESS, message)
+    if(currentActiveState == MessageProcessorActor.States.IDLE)
+      transition(MessageProcessorActor.States.PROCESS, message)
   }
 
   override fun markJobDone() {
+    if(currentActiveState == MessageProcessorActor.States.IDLE)
     transition(MessageProcessorActor.States.JOB_DONE)
   }
 
   private fun processState(msg: String) {
-    Services.processEmail(MessageProcessingRequest(msg)).subscribe()
+    Services.processEmail(MessageProcessingRequest(msg)).block()
 
     transition(MessageProcessorActor.States.IDLE)
   }

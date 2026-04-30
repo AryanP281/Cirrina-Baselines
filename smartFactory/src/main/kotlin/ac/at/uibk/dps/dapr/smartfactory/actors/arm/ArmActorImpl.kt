@@ -7,6 +7,7 @@ import io.dapr.actors.runtime.AbstractActor
 import io.dapr.actors.runtime.ActorRuntimeContext
 import io.dapr.client.DaprClientBuilder
 import org.checkerframework.checker.units.qual.A
+import org.slf4j.LoggerFactory
 import reactor.core.publisher.Mono
 import java.time.Duration
 
@@ -22,6 +23,7 @@ class ArmActorImpl(
     private var partsAssembled = 0
 
     private val daprClient = DaprClientBuilder().build()
+    private val logger = LoggerFactory.getLogger(ArmActorImpl::class.java)
 
     private fun transition(targetState: ArmActor.States, data: Any? = null) {
         when(targetState) {
@@ -77,7 +79,7 @@ class ArmActorImpl(
 
     override fun initiatePickup()
     {
-        if(currActiveState != ArmActor.States.JOB_DONE)
+        if(currActiveState == ArmActor.States.IDLE)
             transition(ArmActor.States.PICKUP)
     }
 
@@ -87,7 +89,8 @@ class ArmActorImpl(
     }
 
     override fun markJobDone() {
-        transition(ArmActor.States.JOB_DONE)
+        if(currActiveState == ArmActor.States.IDLE)
+            transition(ArmActor.States.JOB_DONE)
     }
 
     private fun idleState()
@@ -149,6 +152,7 @@ class ArmActorImpl(
 
         if(partsAssembled >= partsPerProduct)
         {
+            logger.info("+1 product completed")
             partsAssembled = 0
             daprClient.publishEvent("pubsub", "eProductComplete", mapOf<String,Any>()).subscribe()
         }

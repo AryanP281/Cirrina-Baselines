@@ -18,4 +18,5 @@ application { mainClass.set("ac.at.uibk.dps.dapr.smartfactory.SmartFactoryKt") }
 
 tasks.test {
     useJUnitPlatform()
+    maxParallelForks = 1
 }
